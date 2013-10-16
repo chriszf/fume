@@ -43,6 +43,11 @@ class Flow(object):
                 break
         return f
 
+    def summarize(self):
+        print "Flow %s summary: %d expectation(s)"%(self.name, len(self.expectations))
+        for e in self.expectations:
+            print e
+
 class Script(object):
     def __init__(self):
         self.server = "http://localhost:5000"
@@ -57,6 +62,13 @@ class Script(object):
         for flow_num, flow in enumerate(self.flows):
             print "Running flow number %d"%(flow_num+1)
             flow.run(self.server)
+
+        self.summarize()
+
+    def summarize(self):
+        print "Server target %s, %d flow(s)"%(self.server, len(self.flows))
+        for flow in self.flows:
+            flow.summarize()
     
     @classmethod
     def parse_script(cls, filename):
@@ -81,6 +93,3 @@ class Script(object):
                 script.add_flow(f)
 
         return script
-        
-
-

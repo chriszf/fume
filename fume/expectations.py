@@ -20,13 +20,15 @@ class Expectation(object):
     def report_results(self):
         print "Expectation of URL %s\t(line %d)"%(self.url, self.line_num)
         print "%s request made, %d ms"%(self.method_name, self.response_time)
+        print "%d url parameters"%(len(self.args))
+        for k,v in self.args.items():
+            print "\t%s: %s"%(k,v)
+        print "%d form parameters"%(len(self.form))
+        for k,v in self.form.items():
+            print "\t%s: %s"%(k,v)
         print "%d error(s)"%(len(self.results))
         for result in self.results:
             print result
-
-    def run(self, server):
-        print "Connecting to url %s"%self.url
-        pass
 
     @classmethod
     def _parse(cls, url, script_lines, dbg):
@@ -43,6 +45,10 @@ class Expectation(object):
                 dbg.line_num -= 1
                 script_lines.insert(0, line)
                 break
+            elif command == "args":
+                e.args = Expectation._parse_args(script_lines, dbg)
+            elif command == "form":
+                e.form = Expectation._parse_args(script_lines, dbg)
             elif command == "end":
                 if rest == "flow":
                     dbg.line_num -= 1
@@ -50,9 +56,21 @@ class Expectation(object):
                 break
         return e
 
+    @staticmethod
+    def _parse_args(script_lines, dbg):
+        args = {}
+        while script_lines:
+            line = script_lines.pop(0).strip()
+            dbg.line(line)
+            key, val = break_line(line)
+            if line == "end args" or line == "end form":
+                break
+            args[key] = val 
+        return args
+
     def run(self, server):
         url = server + self.url
-        resp = self.method(url)
+        resp = self.method(url, params=self.args, data=self.form)
 
         # Check for the code
         if resp.status_code != self.code:
@@ -67,6 +85,9 @@ class Expectation(object):
                 self.successful = False
 
         self.report_results()
+
+    def __str__(self):
+        return "Url %s: %d errors"%(self.url, len(self.results))
 
 class GetExpectation(Expectation):
     def __init__(self, *args, **kwargs):
