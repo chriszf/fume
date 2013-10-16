@@ -1,0 +1,6 @@
+server: http://localhost:5000
+
+flow main
+get /
+expect This webapp works
+end flow
