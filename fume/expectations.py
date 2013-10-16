@@ -1,6 +1,7 @@
 from results import NotFoundResult, CodeMismatchResult
 import requests
 from parse import break_line
+import time
 
 class Expectation(object):
     """An expectation is a url request and the response that's supposed to come back."""
@@ -70,7 +71,11 @@ class Expectation(object):
 
     def run(self, server):
         url = server + self.url
+
+        start = time.time()
         resp = self.method(url, params=self.args, data=self.form)
+        end = time.time()
+        self.response_time = int(end*1000) - int(start*1000)
 
         # Check for the code
         if resp.status_code != self.code:
