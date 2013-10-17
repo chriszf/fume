@@ -1,6 +1,29 @@
-server: http://localhost:5000
+server http://localhost:5000/
 
 flow main
-get /
-expect This webapp works
+    get /
+        code 200
+        args
+            squid 5
+            hamster this is a space hamster
+        end args
+        expect <H1>This webapp works</H1>
+        expect <h2>Squid</h2>
+    end get
+
+    get /squid
+        code 200
+    end get
+
+    get /squid
+        code 200
+    end get
+    
+    post /fish
+        code 200
+        form
+            squid 3
+            date 10/10/10
+        end form
+    end post
 end flow
