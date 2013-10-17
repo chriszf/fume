@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='fume',
-        version='0.1.1',
+        version='0.1.2',
         description="Fume: a smoke test scripting language",
         author="Christian Fernandez",
         author_email="c@hackbrightacademy.com",
